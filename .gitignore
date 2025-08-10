@@ -1,0 +1,59 @@
+HELP.md
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+# Ignore local properties file to protect sensitive information
+src/main/resources/application-local.properties
+
+# Spring Boot에서 사용하는 민감 정보 파일 무시
+about-me/src/main/resources/application-local.properties
+
+# Node.js에서 사용하는 민감 정보 파일 무시
+frontend/.env.local
+frontend/.env
+
+# OS 및 IDE 관련 파일
+.idea/
+.DS_Store
+
+# Node.js 패키지
+frontend/node_modules
+
+# Spring Boot 빌드 파일
+about-me/build/
+about-me/.gradle/
+about-me/gradle/

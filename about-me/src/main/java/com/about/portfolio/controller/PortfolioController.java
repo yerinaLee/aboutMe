@@ -9,7 +9,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/portfolio")
+@RequestMapping("/portfolio")
 public class PortfolioController {
 
     @Autowired
@@ -34,4 +34,12 @@ public class PortfolioController {
         return portfolioRepository.save(portfolio);
     }
 
+    // userId(email)로 포트폴리오 조회
+    @GetMapping("/view/{userId}")
+    public ResponseEntity<Portfolio> getPublicPortfolioByUserId(@PathVariable String userId){
+        System.out.println("you here???????");
+        return portfolioRepository.findByUserId(userId)
+                .map(ResponseEntity::ok)// 데이터 존재시 200
+                .orElse(ResponseEntity.notFound().build()); // 없을시 404
+    }
 }

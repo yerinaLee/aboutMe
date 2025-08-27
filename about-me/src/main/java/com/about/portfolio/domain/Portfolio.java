@@ -16,4 +16,13 @@ public class Portfolio {
     private String title; // 포트폴리오 제목
     private String description;
 
+    @Override
+    public String toString() {
+        return "Portfolio{" +
+                "id='" + id + '\'' +
+                ", userId='" + userId + '\'' +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                '}';
+    }
 }

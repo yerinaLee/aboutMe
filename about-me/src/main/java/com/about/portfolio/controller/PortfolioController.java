@@ -8,6 +8,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/portfolio")
 public class PortfolioController {
@@ -27,19 +30,54 @@ public class PortfolioController {
     // 포트폴리오 생성 및 업데이트
     @PostMapping
     public Portfolio createOrUpdatePortfolio(@RequestBody Portfolio portfolio, @AuthenticationPrincipal OAuth2User oAuth2User){
+        System.out.println("portfolio : " + portfolio);
+        // portfolio : Portfolio{id='68ae636c107e50110d99be84', userId='null', title='우와아아악', description='아아아아아아가ㄴㅇㄹㄴㅇㄹ'}
+
         String userId = oAuth2User.getAttribute("email");
         portfolio.setUserId(userId);
 
-        portfolioRepository.findByUserId(userId).ifPresent(p -> portfolio.setId(p.getId()));
+        // userId로 기존 포트폴리오 검색 후, 존재시 포트폴리오 ID를 현재 portfolio 객체에 세팅
+        // portfolioRepository.findByUserId(userId).ifPresent(p -> portfolio.setId(p.getId()));
+
+        // 새로 저장하는 데이터인경우, DB id null 값 처리 (null값이 아닌 '' 인 경우 DB id 생성이 되지 않음)
+        if(portfolio.getId() != null || portfolio.getId().isEmpty()){
+            portfolio.setId(null);
+        }
+
+        System.out.println("portfolio with id and userId: " + portfolio);
         return portfolioRepository.save(portfolio);
     }
 
     // userId(email)로 포트폴리오 조회
     @GetMapping("/view/{userId}")
     public ResponseEntity<Portfolio> getPublicPortfolioByUserId(@PathVariable String userId){
-        System.out.println("you here???????");
         return portfolioRepository.findByUserId(userId)
                 .map(ResponseEntity::ok)// 데이터 존재시 200
                 .orElse(ResponseEntity.notFound().build()); // 없을시 404
+    }
+
+    // 포트폴리오 삭제
+    @PostMapping("/delete")
+    public Map<String, Object> deletePublicPortfolioByUserId(@RequestBody Portfolio portfolio, @AuthenticationPrincipal OAuth2User oAuth2User){
+        Map<String, Object> returnMap = new HashMap<>();
+        int returnCode = 1;
+        String msg;
+
+        // 지금 로그인한 유저가 맞는지 유저 검증
+        String loginUserId = oAuth2User.getAttribute("email");
+        if(!(portfolio.getUserId().equals(loginUserId))){
+            returnCode = 5000; // user 정보 없음
+            msg = "user info not valid";
+
+            returnMap.put("returnCode", returnCode);
+            returnMap.put("msg", msg);
+
+            return returnMap;
+        }
+
+        // 수정내용 반영
+        portfolioRepository.delete(portfolio);
+        returnMap.put("returnCode", returnCode);
+        return returnMap;
     }
 }

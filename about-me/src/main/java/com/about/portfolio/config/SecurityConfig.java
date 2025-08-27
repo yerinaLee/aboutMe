@@ -1,5 +1,6 @@
 package com.about.portfolio.config;
 
+import jakarta.servlet.http.HttpSession;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,7 +22,13 @@ public class SecurityConfig {
             )
             .oauth2Login(oauth2 -> oauth2 // 소셜로그인 활성화
                     .defaultSuccessUrl("http://localhost:3000/portfolio", true) // 로그인 성공 시 리다이렉션 될 주소
+            )
+            .logout(logout -> logout
+                    .logoutUrl("/user/logout") // 로그아웃 요청 url
+                    .logoutSuccessUrl("/index") // 로그아웃 성공시 리다이렉트 url
+                    .deleteCookies("JSESSIONID")
             );
+
         return http.build();
     }
 

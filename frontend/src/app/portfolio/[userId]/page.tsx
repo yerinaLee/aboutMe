@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation"; // URL 파라미터를 가져오기 위한 훅
+import styles from './styles.module.css';
 
 interface PortfolioData{
     title: string;
@@ -46,24 +47,24 @@ export default function PublicPortfolioPage(){
 
     // 화면 출력
     if (loading){
-        return <div style={styles.container}><h2>Loading...</h2></div>
+        return <div className={styles.container}><h2>Loading...</h2></div>
     }
 
     if (error){
-        return <div style={styles.container}><h2>{error}</h2></div>;
+        return <div className={styles.container}><h2>{error}</h2></div>;
     }
 
     if(!portfolio){
-        return <div style={styles.container}><h2>포트폴리오가 없습니다.</h2></div>;
+        return <div className={styles.container}><h2>포트폴리오가 없습니다.</h2></div>;
     }
 
     return (
-        <div style={styles.container}>
-            <header style={styles.header}>
+        <div className={styles.container}>
+            <header className={styles.header}>
                 <h1>{portfolio.title}</h1>
             </header>
             <main>
-                <p style={styles.description}>
+                <p className={styles.description}>
                     {portfolio.description}
                 </p>
             </main>
@@ -72,35 +73,4 @@ export default function PublicPortfolioPage(){
             </footer>
         </div>
     );
-}
-
-
-// 심플 스타일 객체
-const styles : { [key:string]: React.CSSProperties } = {
-    container: {
-        fontFamily: 'Arial, sans-serif',
-        maxWidth: '800px',
-        margin: '40px auto',
-        padding: '20px',
-        border: '1px solid #eee',
-        borderRadius: '8px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-    },
-    header: {
-        borderBottom: '2px solid #333',
-        paddingBottom: '10px',
-        marginBottom: '20px',
-    },
-    main: {
-        lineHeight: '1.6',  
-    },
-    description: {
-        whiteSpace: 'pre-wrap', // 줄바꿈과 공백을 그대로 표시
-    },
-    footer: {
-        marginTop: '40px',
-        textAlign: 'center',
-        fontSize: '0.9em',
-        color: '#777',
-    },
 }

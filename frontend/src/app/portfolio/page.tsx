@@ -11,16 +11,27 @@ interface UserInfo {
   picture: string;
 }
 
+interface Project {
+  title:string;
+  description:string;
+  url:string;
+  techStack:string[];
+}
+
 interface PortfolioData{
   id: string;
   userId: string;
   title: string;
   description: string;
+  skills:string[];
+  projects: Project[];
 }
 
 export default function PortfolioPage() {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-  const [portfolio, setPortfolio] = useState<PortfolioData>({title:'', description:'', id:'', userId:''});
+  const [portfolio, setPortfolio] = useState<PortfolioData>({
+    id:'', userId:'', title:'', description:'', skills:[], projects:[],
+  });
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
 
@@ -60,6 +71,8 @@ export default function PortfolioPage() {
             userId:portfolioData.userId || '',
             title: portfolioData.title || '',
             description: portfolioData.description || '',
+            skills: portfolioData.skills || [],
+            projects: portfolioData.projects || [],
           });
         }
       } catch (error) {
@@ -119,7 +132,9 @@ export default function PortfolioPage() {
 
       if (response.ok) {
         setMessage('삭제 성공');
-        setPortfolio({title:'', description:'', id:'', userId:''}); // DB삭제 후 프론트 데이터도 초기화
+        setPortfolio({
+          title:'', description:'', id:'', userId:'', skills:[], projects:[],
+        }); // DB삭제 후 프론트 데이터도 초기화
       } else {
         throw new Error('삭제 실패');
       }
@@ -128,6 +143,39 @@ export default function PortfolioPage() {
       setMessage('오류 발생했습니다. 다시 시도해주세요.');
     }
   };
+
+  // 기술 스택 입력 처리
+  const handleSkillsChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const skillsString = e.target.value;
+    const skillsArray = skillsString.split(',').map(skill => skill.trim());
+    setPortfolio(prev => ({...prev, skills: skillsArray}));
+  }
+
+  // 새 프로젝트 카드 추가
+  const handleAddProject = () => {
+    const newProject: Project = { title: '', description: '', url: '', techStack: [] };
+    setPortfolio(prev => ({...prev, projects: [...prev.projects, newProject]}));
+  }
+
+  // 특정 프로젝트 카드 내용 수정
+  const handleProjectChange = (index: number, field: keyof Project, value: string | string[]) => {
+    const updatedProjects = [...portfolio.projects];
+
+    // 타입에 맞게 value 할당
+    if (field ==='techStack' && typeof value === 'string'){
+      updatedProjects[index][field] = value.split(',').map(tech => tech.trim());
+    } else if (typeof value === 'string'){
+      // title, description, url 필드에 대한 타입 단언
+      (updatedProjects[index][field] as string) = value;
+    }
+    setPortfolio(prev => ({...prev, projects: updatedProjects}));
+  }
+
+  // 특정 프로젝트 카드 삭제
+  const handleDeleteProject = (index:number) => {
+    const updatedProjects = portfolio.projects.filter((_, i) => i !== index);
+    setPortfolio(prev => ({...prev, projects: updatedProjects}));
+  }
   
 
   /*============= 페이지 화면 구성 =============*/
@@ -145,13 +193,15 @@ export default function PortfolioPage() {
   }
 
   return (
-    <div style={{ padding: '20px', maxWidth: '600px', margin: 'auto' }}>
-      <h1>포트폴리오 관리</h1>
-      <a href={`/portfolio/${userInfo.email}`}
-        target="_blank" rel="noopener noreferrer" style={{display:'inline-block', marginTop:'20px', color:'#0070f3'}}
-      >
-        내 포트폴리오 공개 페이지 보기 ↗
-      </a>
+    <div style={{ padding: '20px', maxWidth: '800px', margin: 'auto', fontFamily: 'sans-serif' }}>
+      <header>
+        <h1>포트폴리오 관리</h1>
+        <a href={`/portfolio/${userInfo.email}`}
+          target="_blank" rel="noopener noreferrer" style={{display:'inline-block', marginTop:'20px', color:'#0070f3'}}>
+          내 포트폴리오 공개 페이지 보기 ↗
+        </a>
+      </header>
+      
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
         <img src={userInfo.picture} alt="프로필 사진" style={{ width: 50, height: 50, borderRadius: '50%' }} />
         <div style={{ marginLeft: '10px' }}>
@@ -160,62 +210,69 @@ export default function PortfolioPage() {
         </div>
       </div>
       
-      <h3>첫 포트폴리오 저장 기능</h3>
       <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '15px' }}>
-          <label htmlFor="title" style={{ display: 'block', marginBottom: '5px' }}>포트폴리오 제목</label>
-          <input
-            type="text"
-            id="title"
-            name="title"
-            value={portfolio.title}
-            onChange={handleInputChange}
-            style={{ width: '100%', padding: '8px' }}
-          />
-        </div>
-        <div style={{ marginBottom: '15px' }}>
-          <label htmlFor="description" style={{ display: 'block', marginBottom: '5px' }}>상세 설명</label>
-          <textarea
-            id="description"
-            name="description"
-            value={portfolio.description}
-            onChange={handleInputChange}
-            rows={10}
-            style={{ width: '100%', padding: '8px' }}
-          />
-        </div>
-        <button type="submit" style={{ padding: '10px 15px' }}>저장하기</button>
-      </form>
+        <div>포트폴리오 id : {portfolio.id}</div>
+        {/* 기본 정보 섹션 */}
+        <section style={{marginBottom: '40px'}}>
+          <h2>기본 정보</h2>
+          <div style={{marginBottom: '15px'}}>
+            <label>포트폴리오 제목</label>
+            <input name='title' value={portfolio.title} onChange={handleInputChange} style={inputStyle} />
+          </div>
+          <div style={{marginBottom: '15px'}}>
+            <label>상세 기술</label>
+            <input name='description' value={portfolio.description} onChange={handleInputChange} style={inputStyle} />
+          </div>
+        </section>
 
-      <br/><br/>
-      <h3>포트폴리오 삭제 기능</h3>
-      <form onSubmit={handleDeleteSubmit}>
-        <div style={{ marginBottom: '15px' }}>
-          <label htmlFor="title" style={{ display: 'block', marginBottom: '5px' }}>포트폴리오 제목</label>
-          <input
-            type="text"
-            id="title"
-            name="title"
-            value={portfolio.title}
-            onChange={handleInputChange}
-            style={{ width: '100%', padding: '8px' }}
-          />
-        </div>
-        <div style={{ marginBottom: '15px' }}>
-          <label htmlFor="description" style={{ display: 'block', marginBottom: '5px' }}>상세 설명</label>
-          <textarea
-            id="description"
-            name="description"
-            value={portfolio.description}
-            onChange={handleInputChange}
-            rows={10}
-            style={{ width: '100%', padding: '8px' }}
-          />
-        </div>
-        <button type="submit" style={{ padding: '10px 15px' }}>삭제하기</button>
-      </form>
+        {/* 기술 스택 섹션 */}
+        <section style={{marginBottom: '40px'}}>
+          <h2>기술 스택</h2>
+          <label>쉼표(,)로 구분하여 작성해주세요 (예: Java, Spring, React)</label>
+          <input value={portfolio.skills.join(', ')} onChange={handleSkillsChange} style={inputStyle} />
+        </section>
 
-      {message && <p>{message}</p>}
+        {/* 프로젝트 경험 섹션 */}
+        <section style={{marginBottom: '40px'}}>
+          <h2>프로젝트 경험</h2>
+          {portfolio.projects.map((project, index) => (
+            <div key={index} style={{ border: '1px solid #ccc', padding: '15px', borderRadius: '8px', marginBottom: '15px' }}>
+              <div style={{display: 'flex', justifyContent: 'space-between'}}>
+                <h4>프로젝트 #{index +1}</h4>
+                <button type='button' onClick={()=> handleDeleteProject(index)} style={{color: 'red'}}>삭제</button>
+              </div>
+              <div style={{marginBottom : '10px'}}>
+                <label>프로젝트명</label>
+                <input value={project.title} onChange={(e) => handleProjectChange(index, 'title', e.target.value)} style={inputStyle} />
+              </div>
+              <div style={{ marginBottom: '10px' }}>
+                <label>설명</label>
+                <textarea value={project.description} onChange={(e) => handleProjectChange (index, 'description', e.target.value)} style={{...inputStyle, height: '100px'}}/>
+              </div>
+              <div style={{ marginBottom: '10px' }}>
+                <label>관련 링크 (GitHub 등)</label>
+                <input value={project.url} onChange={(e) => handleProjectChange(index, 'url', e.target.value)} style={inputStyle} />
+              </div>
+              <div>   
+                <label>사용 기술 (쉼표로 구분)</label>
+                <input value={project.techStack.join(', ')} onChange={(e) => handleProjectChange(index, 'techStack', e.target.value)} style={inputStyle} />
+              </div>
+            </div>
+          ))}
+          <button type="button" onClick={handleAddProject}>+ 프로젝트 추가</button>
+        </section>
+
+        <hr />
+        <button type="submit" style={{ padding: '10px 20px', fontSize: '1.2em', marginTop: '20px' }}>전체 포트폴리오 저장하기</button>
+        {message && <p style={{ marginTop: '15px' }}>{message}</p>}
+      </form>
     </div>
   );
 }
+
+const inputStyle: React.CSSProperties = {
+  width: '100%',
+  padding: '8px',
+  boxSizing: 'border-box',
+  marginTop: '5px'
+};

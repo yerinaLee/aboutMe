@@ -4,10 +4,20 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation"; // URL 파라미터를 가져오기 위한 훅
 import styles from './styles.module.css';
 
-interface PortfolioData{
+interface Project {
     title: string;
     description: string;
+    url: string;
+    techStack: string[];
 }
+
+interface PortfolioData {
+    title: string;
+    description: string;
+    skills: string[];
+    projects: Project[];
+}
+
 
 // 포트폴리오 화면 조회
 export default function PublicPortfolioPage(){
@@ -62,13 +72,46 @@ export default function PublicPortfolioPage(){
         <div className={styles.container}>
             <header className={styles.header}>
                 <h1>{portfolio.title}</h1>
+                <p className={styles.description}>{portfolio.description}</p>
             </header>
             <main>
-                <p className={styles.description}>
-                    {portfolio.description}
-                </p>
+                {/* 기술 스택 섹션 */}
+                {portfolio.skills && portfolio.skills.length > 0 && (
+                    <section className={styles.section}>
+                        <h2 className={styles.sectionTitle}>Skills</h2>
+                        <div className={styles.skillsContainer}>
+                            {portfolio.skills.map((skill, index) => (
+                                <span key={index} className={styles.skillTag}>{skill}</span>
+                            ))}
+                        </div>
+                    </section>
+                )}
+                {/* 프로젝트 경험 섹션 */}
+                {portfolio.projects && portfolio.projects.length > 0 && (
+                    <section className={styles.section}>
+                        <h2 className={styles.sectionTitle}>Projects</h2>
+                        {portfolio.projects.map((project, index) => (
+                            <div key={index} className={styles.projectCard}>
+                                <div className={styles.projectHeader}>
+                                    <h3>{project.title}</h3>
+                                    {project.url && (
+                                        <a href={project.url} target="_blank" rel="noopener noreferrer" className={styles.projectLink}>
+                                            Link ↗
+                                        </a>
+                                    )}
+                                </div>
+                                <p className={styles.projectDescription}>{project.description}</p>
+                                <div className={styles.skillsContainer}>
+                                    {project.techStack.map((tech, techIndex) => (
+                                        <span key={techIndex} className={styles.skillTag}>{tech}</span>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </section>
+                )}
             </main>
-            <footer>
+            <footer className={styles.footer}>
                 <p>&copy; 2025 My Portfolio</p>
             </footer>
         </div>

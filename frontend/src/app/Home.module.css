@@ -72,3 +72,36 @@
   border-radius: 15px;
   font-size: 0.85rem;
 }
+
+.searchForm {
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.searchInput {
+  width: 350px;
+  padding: 12px 15px;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.searchButton, .resetButton {
+  padding: 12px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.searchButton {
+  background-color: #0070f3;
+  color: white;
+}
+
+.resetButton {
+  background-color: #f0f0f0;
+  color: #333;
+}

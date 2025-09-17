@@ -9,6 +9,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -36,7 +37,9 @@ public class PortfolioController {
         // portfolio : Portfolio{id='68ae636c107e50110d99be84', userId='null', title='우와아아악', description='아아아아아아가ㄴㅇㄹㄴㅇㄹ'}
 
         String userId = oAuth2User.getAttribute("email");
+        String userName = oAuth2User.getAttribute("name"); // google name 정보
         portfolio.setUserId(userId);
+        portfolio.setUserName(userName);
 
         // userId로 기존 포트폴리오 검색 후, 존재시 포트폴리오 ID를 현재 portfolio 객체에 세팅
         // portfolioRepository.findByUserId(userId).ifPresent(p -> portfolio.setId(p.getId()));
@@ -82,4 +85,13 @@ public class PortfolioController {
         returnMap.put("returnCode", returnCode);
         return returnMap;
     }
+
+    @GetMapping("/all")
+    public List<Portfolio> getAllPortfolios(){
+        return portfolioRepository.findAll();
+    }
+
+
+
+
 }

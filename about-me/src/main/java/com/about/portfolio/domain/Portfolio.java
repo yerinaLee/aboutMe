@@ -19,6 +19,7 @@ public class Portfolio {
     private String description;
     private List<String> skills; // 보유 기술 스택 목록
     private List<Project> projects; // 프로젝트 진행 목록
+    private String userName;
 
     @Override
     public String toString() {
@@ -29,6 +30,7 @@ public class Portfolio {
                 ", description='" + description + '\'' +
                 ", skills=" + skills +
                 ", projects=" + projects +
+                ", userName=" + userName +
                 '}';
     }
 }

@@ -1,0 +1,74 @@
+/* frontend/app/Home.module.css */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  font-family: sans-serif;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.header h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.header p {
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.galleryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.cardLink {
+  text-decoration: none;
+  color: inherit;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #eaeaea;
+  border-radius: 12px;
+  padding: 25px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  height: 100%;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.card h3 {
+  font-size: 1.4rem;
+  margin: 0 0 10px 0;
+}
+
+.cardAuthor {
+  font-size: 0.9rem;
+  color: #888;
+  margin: 0 0 20px 0;
+}
+
+.cardSkills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.skillTag {
+  background-color: #eef1f5;
+  color: #334;
+  padding: 5px 12px;
+  border-radius: 15px;
+  font-size: 0.85rem;
+}

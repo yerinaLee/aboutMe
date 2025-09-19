@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Toaster } from 'react-hot-toast'; // react popup 추가
+import Header from "../../components/Header";
+import Footer from "../../components/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,9 +26,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="ko">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <Header/>
         {children}
+        <Toaster/> {/* body 태그 바로 위에 Toaster 컴포넌트 추가 */}
+        {/* <Footer/> */}
       </body>
     </html>
   );

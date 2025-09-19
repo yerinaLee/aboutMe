@@ -17,3 +17,9 @@ frontend/.next/
 about-me/src/main/resources/application-local.properties
 frontend/.env.local
 frontend/.env
+
+
+frontend/package-lock.json
+frontend/package.json
+package-lock.json
+package.json

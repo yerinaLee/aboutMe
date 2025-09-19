@@ -3,6 +3,7 @@
 "use client";
 
 import { useEffect, useState, FormEvent, ChangeEvent } from 'react';
+import toast from 'react-hot-toast';
 
 // 데이터타입 정의
 interface UserInfo {
@@ -33,7 +34,7 @@ export default function PortfolioPage() {
     id:'', userId:'', title:'', description:'', skills:[], projects:[],
   });
   const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState('');
+  // const [message, setMessage] = useState('');
 
   // 페이지가 로드될 때 사용자 정보와 기존 포트폴리오 정보 조회
   useEffect(() => {
@@ -63,7 +64,7 @@ export default function PortfolioPage() {
         setUserInfo(currentUserInfo);
 
         // 2. 기존 포트폴리오 정보 get
-        const portfolioResponse = await fetch('/api/portfolio');
+        const portfolioResponse = await fetch('/api/portfolio'); 
         if (portfolioResponse.ok){
           const portfolioData = await portfolioResponse.json();
           setPortfolio({
@@ -91,35 +92,84 @@ export default function PortfolioPage() {
     setPortfolio(prev => ({ ...prev, [name]: value}));
   }
 
+
+  
+
   // 저장 버튼 클릭시
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // 폼 제출시 새로고침 방지
-    setMessage('저장 중...');
 
-    try {
-      const response = await fetch('/api/portfolio', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(portfolio),
-      });
-
-      if (response.ok) {
-        setMessage('저장 성공');
-      } else {
-        throw new Error('저장 실패');
+    const promise = fetch('/api/portfolio', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(portfolio),
+    }).then(async (response) => {
+      if(!response.ok){
+        throw new Error('저장에 실패했습니다.');
       }
-    } catch(error){
-      console.log(error);
-      setMessage('오류 발생했습니다. 다시 시도해주세요.');
-    }
+      const savedData = await response.json();
+      setPortfolio(prev => ({...prev, id:savedData.id}));
+    });
+
+    toast.promise(promise, {
+      loading:'저장 중...',
+      success: '성공적으로 저장되었습니다!',
+      error:'오류가 발생했습니다. 다시 시도해주세요.',
+    });
+
+    // setMessage('저장 중...');
+
+    // try {
+    //   const response = await fetch('/api/portfolio', {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify(portfolio),
+    //   });
+
+    //   if (response.ok) {
+    //     // setMessage('저장 성공');
+    //     setToast('저장 성공');
+    //   } else {
+    //     throw new Error('저장 실패');
+    //   }
+    // } catch(error){
+    //   console.log(error);
+    //   setMessage('오류 발생했습니다. 다시 시도해주세요.');
+    // }
   };
 
+
   // 삭제 버튼 클릭시
-  const handleDeleteSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // 폼 제출시 새로고침 방지
-    setMessage('수정사항 저장 중...');
+  const handleDelete = async () => {
+    if(!portfolio || !portfolio.id) return;
+
+    if (confirm("정말 이 포트폴리오를 삭제하시겠습니까?")) {
+      const promise = fetch('/api/portfolio/delete', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(portfolio),
+      }).then((response) => {
+        if(response.ok){
+          setPortfolio({
+            title:'', description:'', id:'', userId:'', skills:[], projects:[],
+          }); // DB삭제 후 프론트 데이터도 초기화
+        } else {
+          throw new Error('삭제 권한이 없거나 오류가 발생했습니다.');
+        }
+      });
+
+      toast.promise(promise, {
+          loading: '삭제 중...',
+          success: '삭제되었습니다.',
+          error: '삭제에 실패했습니다.'
+      });
+    }
+
+    /* setMessage('수정사항 저장 중...');
 
     try {
       const response = await fetch('/api/portfolio/delete', {
@@ -141,8 +191,12 @@ export default function PortfolioPage() {
     } catch(error){
       console.log(error);
       setMessage('오류 발생했습니다. 다시 시도해주세요.');
-    }
+    } */
   };
+
+
+
+
 
   // 기술 스택 입력 처리
   const handleSkillsChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -264,8 +318,11 @@ export default function PortfolioPage() {
 
         <hr />
         <button type="submit" style={{ padding: '10px 20px', fontSize: '1.2em', marginTop: '20px' }}>전체 포트폴리오 저장하기</button>
-        {message && <p style={{ marginTop: '15px' }}>{message}</p>}
+        {/* {message && <p style={{ marginTop: '15px' }}>{message}</p>} */}
       </form>
+      
+      <button type="button" onClick={handleDelete}>삭제하기</button>
+      
     </div>
   );
 }

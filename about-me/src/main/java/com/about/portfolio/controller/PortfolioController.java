@@ -93,8 +93,6 @@ public class PortfolioController {
 
     @GetMapping("/search")
     public List<Portfolio> searchPortfoliosBySkill(@RequestParam String skills){
-
-        System.out.println("are you here???" + skills);
         return portfolioRepository.findBySkillsContains(skills);
     }
 
